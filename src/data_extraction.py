@@ -6,20 +6,43 @@ from googleapiclient.errors import HttpError
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
-def get_video_id(video_url: str) -> str:
+def get_video_id_from_url(video_url: str) -> str | None:
     '''
-    Extrai o id do vídeo considerando a url completa
+    Extrai o id do vídeo de uma url comum do Youtube.
+
+    Tipos de url:
+    - http://www.youtube.com/watch?v=VIDEO_ID&... -> mais comum na barra de pesquisa
+    - http://www.youtube.com/watch?v=VIDEO_ID -> versão curta
+    - http://youtube.com/v/VIDEO_ID?... -> versão mais antiga
+    - http://youtu.be/VIDEO_ID?... -> link de compartilhamento
+    - http://www.youtube.com/embed/VIDEO_ID?...  -> vídeos encapsulados em outros sites
     
     param
-        video_url: url completa do vídeo
+        video_url: url comum do vídeo
 
     return
-        video_id: sequencia de caracteres identificador do vídeo (id do vídeo)
+        video_id: string que representa o id do vídeo
     '''
-    ini = video_url.find('v=') + 2
-    fin = video_url.find('&') if '&' in video_url else len(video_url)
-    video_id = video_url[ini:fin]
-    return video_id
+
+    if not video_url:
+        return None
+
+    video_id = None
+    if 'watch?v=' in video_url:
+        video_id = video_url.split('watch?v=')[1].split('&')[0]
+    elif "youtu.be/" in video_url:
+        video_id = video_url.split("youtu.be/")[1].split("?")[0]
+    elif "embed/" in video_url:
+        video_id = video_url.split("embed/")[1].split("?")[0]
+    elif "/v/" in video_url:    
+         video_id = video_url.split("/v/")[1].split("?")[0]
+
+    if video_id:
+        print(f'Vídeo id "{video_id}" extraído com sucesso da url {video_url}')
+        return video_id
+    else:
+        print(f'Não foi possível extrair um vídeo id válido da url: {video_url}')
+        return None
 
 
 def get_youtube_service() -> object | None:
@@ -59,7 +82,7 @@ def get_metadata(service: object, video_url: str) -> dict:
         return {'title': None, 'description': None}
 
     try:
-        video_id = get_video_id(video_url)
+        video_id = get_video_id_from_url(video_url)
 
         request = service.videos().list(
             part='snippet',
@@ -88,26 +111,38 @@ def get_metadata(service: object, video_url: str) -> dict:
         return {"title": None, "description": None}
 
 
-def get_transcript(video_url: str) -> object: 
-    
+def get_transcript(video_url: str) -> list: 
+    '''
+    Extrai a transcrição de um vídeo do Youtube usando youtube_transcript_api
+
+    args
+        video_url: url completa do vídeo do Youtube
+
+    returns
+        formatted_transcript: transcrição do vídeo já no formato esperado
+    '''
     try:
-        video_id = get_video_id(video_url)
+        video_id = get_video_id_from_url(video_url)
         fetched_transcript = YouTubeTranscriptApi().fetch(video_id, languages=('pt', 'en')).to_raw_data() # já no formato json
         formatted_transcript = [{'start': snippet.get('start'), 'text': snippet.get('text')} for snippet in fetched_transcript]
+        print(f'Transcrição extraída com sucesso para o vídeo id: {video_id}')
         return formatted_transcript
     
     except Exception as e:
-        return None
+        print(f'Não foi possível extrair a transcrição do vídeo id {video_id}: {e}')
+        return []
+
 
 if __name__ == '__main__':
     # Carregar variáveis de ambiente
     load_dotenv('./.env')
 
-    video_url = 'https://www.youtube.com/watch?v=N6kdD_x3v1g&ab_channel=InvestidorSardinhalRaulSena'
-    metadata = get_metadata(get_youtube_service(), video_url)
-    print(metadata)
-    transcript = get_transcript(video_url)
-    for snippet in transcript:
-        print(snippet)
-        break
+    video_url = 'https://www.youtube.com/watch?v=N6kdD_x3v1g'
+    # metadata = get_metadata(get_youtube_service(), video_url)
+    # print(metadata)
+    # transcript = get_transcript(video_url)
+    # for snippet in transcript:
+    #     print(snippet)
+    #     break
+    print(get_video_id_from_url(video_url))
 
