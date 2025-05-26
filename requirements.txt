@@ -1,0 +1,7 @@
+youtube-transcript-api == 1.0.3
+google-api-python-client == 2.170.0
+google-auth == 2.40.2
+google-auth-oauthlib == 1.2.2
+google-auth-httplib2 == 0.2.0
+python-dotenv == 1.1.0
+nltk == 3.9.1
