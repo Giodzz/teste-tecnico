@@ -1,4 +1,39 @@
 # Teste Técnico
 Repositório para organizar código e documentação do teste técnico para projeto no ceia 
 
-## Como configurar o ambiente?
+## Configurar Ambiente
+
+### 1. Clonar repositório git
+Clone o repositório do github para uma pasta local no seu computador
+```
+git clone https://github.com/CEIA-Koru/dados_sinteticos.git
+```
+
+### 2. Configurar Ambiente Virtual
+É recomendado o uso de um ambiente virtual python para evitar conflitos de dependências de bibliotecas com outros projetos. Na mesma pasta em que foi clonado o repositório, execute: 
+
+**Windows**
+``` bash
+# criar ambiente virtual
+python -m venv .venv
+
+# ativar ambiente virtual
+.venv\Scripts\activate
+```
+
+**Linux ou MAC**
+``` bash
+# criar ambiente virtual
+python3 -m venv .venv
+
+# ativar ambiente virtual
+source .venv/bin/activate
+```
+
+Obs: a pasta `.venv` fica de fora da pasta do repositório.
+
+### 3. Instalar Dependências
+Com o ambiente virtual ativado, instale as dependências do projeto com o comando:
+``` bash
+pip install -r ./dados_sinteticos/requirement.txt
+```
