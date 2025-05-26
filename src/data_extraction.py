@@ -5,6 +5,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from youtube_transcript_api import YouTubeTranscriptApi
 
+# logger para este módulo
+logger = logging.getLogger(__name__)
 
 def get_video_id_from_url(video_url: str) -> str | None:
     '''
@@ -25,6 +27,7 @@ def get_video_id_from_url(video_url: str) -> str | None:
     '''
 
     if not video_url:
+        logger.warning('Tentativa de extrair ID de uma URL vazia')
         return None
 
     video_id = None
@@ -38,10 +41,10 @@ def get_video_id_from_url(video_url: str) -> str | None:
          video_id = video_url.split("/v/")[1].split("?")[0]
 
     if video_id:
-        print(f'Vídeo id "{video_id}" extraído com sucesso da url {video_url}')
+        logger.info(f'Vídeo ID "{video_id}" extraído com sucesso da URL {video_url}')
         return video_id
     else:
-        print(f'Não foi possível extrair um vídeo id válido da url: {video_url}')
+        logger.error(f'Não foi possível extrair um vídeo ID válido da URL: {video_url}')
         return None
 
 
@@ -53,16 +56,16 @@ def get_youtube_service() -> object | None:
 
     api_key = os.getenv('YOUTUBE_API_KEY')
     if not api_key:
-        print("A variável de ambiente YOUTUBE_API_KEY não está configurada.")
+        logger.error("A variável de ambiente YOUTUBE_API_KEY não está configurada.")
         return None
     
     try:
         service = build('youtube', 'v3', developerKey=api_key)
-        print('Serviço da API do Youtube foi inicializado com sucesso')
+        logger.info('Serviço da API do Youtube foi inicializado com sucesso')
         return service
     
     except Exception as e:
-        print(f'Erro ao inicializar o serviço da API do Youtube: {e}')
+        logger.critical(f'Erro ao inicializar o serviço da API do Youtube: {e}')
         return None
 
 
@@ -78,7 +81,7 @@ def get_metadata(service: object, video_url: str) -> dict:
     '''
 
     if not service:
-        print('Serviço da API do Youtube não está disponível para buscar metadados.')
+        logger.warning('Serviço da API do Youtube não está disponível para buscar metadados.')
         return {'title': None, 'description': None}
 
     try:
@@ -96,18 +99,18 @@ def get_metadata(service: object, video_url: str) -> dict:
                 'title': snippet.get('title'),
                 'description': snippet.get('description'),
             }
-            print(f'Metadados extraídos com sucesso para o vídeo id: {video_id}')
+            logger.info(f'Metadados extraídos com sucesso para o vídeo id: {video_id}')
             return metadata
         else:
-            print(f'Nenhum item encontrado para vídeo id: {video_id}')
+            logger.warning(f'Nenhum item encontrado para vídeo id: {video_id}')
             return {"title": None, "description": None}
 
     except HttpError as e:
-        print(f"Erro HTTP ao extrair metadados do vídeo ID {video_id} via API: {e}")
+        logger.error(f"Erro HTTP ao extrair metadados do vídeo ID {video_id} via API: {e}")
         return {"title": None, "description": None}
     
     except Exception as e:
-        print(f"Erro inesperado ao extrair metadados do vídeo ID {video_id} via API: {e}")
+        logger.error(f"Erro inesperado ao extrair metadados do vídeo ID {video_id} via API: {e}")
         return {"title": None, "description": None}
 
 
@@ -125,26 +128,37 @@ def get_transcript(video_url: str) -> list:
         video_id = get_video_id_from_url(video_url)
         fetched_transcript = YouTubeTranscriptApi().fetch(video_id, languages=('pt', 'en')).to_raw_data() # já no formato json
         formatted_transcript = [{'start': snippet.get('start'), 'text': snippet.get('text')} for snippet in fetched_transcript]
-        print(f'Transcrição extraída com sucesso para o vídeo id: {video_id}')
+        logger.info(f'Transcrição extraída com sucesso para o vídeo id: {video_id}')
         return formatted_transcript
     
     except Exception as e:
-        print(f'Não foi possível extrair a transcrição do vídeo id {video_id}: {e}')
+        logger.error(f'Não foi possível extrair a transcrição do vídeo id {video_id}: {e}')
         return []
 
 
 if __name__ == '__main__':
+    # Configurar o logging
+    logging.basicConfig(
+        level=logging.INFO,  # nível mínimo de severidade
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # formato da mensagem de log
+        handlers=[
+            logging.StreamHandler()  # enviar logs para o console 
+            # logging.FileHandler("app.log") # salvar em arquivo
+        ]
+    )
+
     # Carregar variáveis de ambiente
     load_dotenv('./.env')
+
     video_url = 'https://www.youtube.com/watch?v=N6kdD_x3v1g'
     get_video_id_from_url(video_url)
-    print()
+    # print()
     
     metadata = get_metadata(get_youtube_service(), video_url)
-    print(metadata)
-    print()
+    # print(metadata)
+    # print()
 
     transcript = get_transcript(video_url)
-    for snippet in transcript[:5]:
-        print(snippet)
+    # for snippet in transcript[:5]:
+    #     print(snippet)
 
