@@ -10,7 +10,7 @@ git clone https://github.com/CEIA-Koru/dados_sinteticos.git
 ```
 
 ### 2. Configurar Ambiente Virtual
-É recomendado o uso de um ambiente virtual python para evitar conflitos de dependências de bibliotecas com outros projetos. Na mesma pasta em que foi clonado o repositório, execute: 
+É recomendado o uso de um ambiente virtual python para evitar conflitos de dependências de bibliotecas com outros projetos. Na mesma pasta em que foi clonado o repositório (a pasta `.venv` fica de fora da pasta do repositório), execute: 
 
 **Windows**
 ``` bash
@@ -30,10 +30,17 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Obs: a pasta `.venv` fica de fora da pasta do repositório.
+OBS: assume-se que já tenha python3.9+ instalado na máquina
 
 ### 3. Instalar Dependências
 Com o ambiente virtual ativado, instale as dependências do projeto com o comando:
 ``` bash
-pip install -r ./dados_sinteticos/requirement.txt
+pip install -r ./teste-tecnico/requirement.txt
 ```
+
+### 4. Criar arquivo .env
+Dentro da pasta `./teste-tecnico`, crie um arquivo chamado `.env` e configure sua chave API do youtube da seguinte forma:
+```
+YOUTUBE_API_KEY=<sua-cahve-aqui>
+```
+
