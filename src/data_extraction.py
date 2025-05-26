@@ -136,6 +136,7 @@ def get_transcript(video_url: str) -> list:
         return []
 
 
+
 if __name__ == '__main__':
     # Configurar o logging
     logging.basicConfig(
@@ -155,10 +156,10 @@ if __name__ == '__main__':
     # print()
     
     metadata = get_metadata(get_youtube_service(), video_url)
-    # print(metadata)
-    # print()
+    print(metadata)
+    print()
 
     transcript = get_transcript(video_url)
-    # for snippet in transcript[:5]:
-    #     print(snippet)
+    for snippet in transcript[:5]:
+        print(snippet)
 
