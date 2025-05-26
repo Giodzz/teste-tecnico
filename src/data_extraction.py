@@ -136,13 +136,15 @@ def get_transcript(video_url: str) -> list:
 if __name__ == '__main__':
     # Carregar variáveis de ambiente
     load_dotenv('./.env')
-
     video_url = 'https://www.youtube.com/watch?v=N6kdD_x3v1g'
-    # metadata = get_metadata(get_youtube_service(), video_url)
-    # print(metadata)
-    # transcript = get_transcript(video_url)
-    # for snippet in transcript:
-    #     print(snippet)
-    #     break
-    print(get_video_id_from_url(video_url))
+    get_video_id_from_url(video_url)
+    print()
+    
+    metadata = get_metadata(get_youtube_service(), video_url)
+    print(metadata)
+    print()
+
+    transcript = get_transcript(video_url)
+    for snippet in transcript[:5]:
+        print(snippet)
 
