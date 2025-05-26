@@ -44,3 +44,8 @@ Dentro da pasta `./teste-tecnico`, crie um arquivo chamado `.env` e configure su
 YOUTUBE_API_KEY=<sua-cahve-aqui>
 ```
 
+### 5. Executar main.py
+```
+python .\teste-tecnico\main.py
+```
+
