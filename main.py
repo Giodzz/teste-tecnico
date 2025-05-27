@@ -2,7 +2,12 @@ import os
 from dotenv import load_dotenv
 import logging
 import json
-from src.data_extraction import *
+from src.data_extraction import (
+    get_video_id_from_url,
+    get_youtube_service,
+    get_metadata,
+    get_transcript
+)
 from src.data_processing import *
 
 # Configurar o logging
@@ -27,7 +32,7 @@ load_dotenv(dotenv_path)
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 
-def extrair_formatar_dados(video_url: str | None) -> object | None:
+def extrair_dados(video_url: str | None) -> dict | None:
     
     if not video_url:
         logger.warning('Tentativa de extrair dados de vídeo de uma URL vazia')
@@ -56,6 +61,17 @@ if __name__ == '__main__':
     while True:
         video_url = input('URL do vídeo ["sair" para sair]: ')
         if 'sair' in video_url.casefold().strip():
+            logger.info('Finalizando o programa...')
             break
+        
 
-        extrair_formatar_dados(video_url)
+        dados_processados = extrair_dados(video_url)
+        if dados_processados:
+            json_output_string = json.dumps(dados_processados, indent=4, ensure_ascii=False)
+
+            logger.info("Dados processados e convertidos para JSON com sucesso.")
+            print("\n--- SAÍDA JSON GERADA ---")
+            print(json_output_string) # Imprime a string JSON (simulando armazenamento em memória)
+            print("--- FIM DA SAÍDA JSON ---\n")
+    
+    logger.info("--- Pipeline de Extração de Vídeos do YouTube Finalizado ---")
