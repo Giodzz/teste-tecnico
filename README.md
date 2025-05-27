@@ -12,10 +12,11 @@ O pipeline segue a seguinte forma:
 Pré-requisitos:
 - python3.9+ instalado
 - pip instalado
+- git instalado
 
 ### 1. Clonar repositório git
 Clone o repositório do github para uma pasta local no seu computador
-```
+```bash
 git clone https://github.com/Giodzz/teste-tecnico.git
 cd ./teste-tecnico
 ```
