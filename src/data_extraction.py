@@ -84,9 +84,12 @@ def get_metadata(service: object, video_url: str) -> dict:
         logger.warning('Serviço da API do Youtube não está disponível para buscar metadados.')
         return {'title': None, 'description': None}
 
-    try:
-        video_id = get_video_id_from_url(video_url)
+    video_id = get_video_id_from_url(video_url)
+    if not video_id:
+        logger.error(f"Não foi possível obter video_id para a URL {video_url} em get_metadata.")
+        return {'title': None, 'description': None}
 
+    try:
         request = service.videos().list(
             part='snippet',
             id=video_id
@@ -124,9 +127,14 @@ def get_transcript(video_url: str) -> list:
     returns
         formatted_transcript: transcrição do vídeo já no formato esperado
     '''
+
+    video_id = get_video_id_from_url(video_url)
+    if not video_id:
+        logger.error(f"Não foi possível obter video_id para a URL {video_url} em get_transcript.")
+        return []
+    
     try:
-        video_id = get_video_id_from_url(video_url)
-        fetched_transcript = YouTubeTranscriptApi().fetch(video_id, languages=('pt', 'en')).to_raw_data() # já no formato json
+        fetched_transcript = YouTubeTranscriptApi().fetch(video_id, languages=('pt')).to_raw_data()
         formatted_transcript = [{'start': snippet.get('start'), 'text': snippet.get('text')} for snippet in fetched_transcript]
         logger.info(f'Transcrição extraída com sucesso para o vídeo id: {video_id}')
         return formatted_transcript

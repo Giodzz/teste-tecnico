@@ -78,7 +78,7 @@ def clean_text(texto: str | None) -> str:
     # Normalizar multiplos espaços
     texto = re.sub(r'\s+', ' ', texto).strip()
 
-    logger.info(f'Texto limpo: {texto[:100]}')
+    logger.info(f'Texto após limpeza: {texto[:100]}')
     return texto
 
 
