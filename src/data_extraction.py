@@ -134,14 +134,37 @@ def get_transcript(video_url: str) -> list:
         return []
     
     try:
-        fetched_transcript = YouTubeTranscriptApi().fetch(video_id, languages=('pt', 'Portuguese (auto-generated)')).to_raw_data()
-        formatted_transcript = [{'start': snippet.get('start'), 'text': snippet.get('text')} for snippet in fetched_transcript]
-        logger.info(f'Transcrição extraída com sucesso para o vídeo id: {video_id}')
-        return formatted_transcript
-    
+        # Encontrar transcrição
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        target_transcript = None
+        try:
+            # Tentar transcrição manual
+            target_transcript = transcript_list.find_manually_created_transcript(['pt', 'Portuguese (auto-generated)'])
+            logger.info(f"Transcrição manual em português encontrada para o vídeo ID: {video_id}")
+        
+        except:
+            try:
+                # Tentar transcrição gerada automaticamente
+                target_transcript = transcript_list.find_generated_transcript(['pt', 'Portuguese (auto-generated)'])
+                logger.info(f"Transcrição gerada automaticamente em português encontrada para o vídeo ID: {video_id}")
+            except: 
+                logger.warning(f"Nenhuma transcrição em português (manual ou gerada) encontrada para o vídeo ID: {video_id}.")
+                return []
+        
+        # Buscar os dados da transcrição
+        if target_transcript:
+            fetched_transcript_data = target_transcript.fetch()
+            formatted_transcript = [{'start': snippet.start, 'text': snippet.text} for snippet in fetched_transcript_data]
+            logger.info(f'Transcrição (idioma: {target_transcript.language_code}) extraída com sucesso para o vídeo ID: {video_id}')
+            return formatted_transcript
+        else:
+            logger.warning(f"Nenhuma transcrição em português pôde ser carregada para o vídeo ID: {video_id}.")
+            return []
+        
     except Exception as e:
-        logger.error(f'Não foi possível extrair a transcrição do vídeo id {video_id}: {e}')
+        logger.error(f'Não foi possível extrair a transcrição para {video_url}: {e}')
         return []
+
 
 
 
@@ -161,11 +184,6 @@ if __name__ == '__main__':
 
     video_url = 'https://www.youtube.com/watch?v=N6kdD_x3v1g'
     get_video_id_from_url(video_url)
-    # print()
-    
-    metadata = get_metadata(get_youtube_service(), video_url)
-    print(metadata)
-    print()
 
     transcript = get_transcript(video_url)
     for snippet in transcript[:5]:
