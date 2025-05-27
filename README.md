@@ -30,7 +30,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-OBS: assume-se que já tenha python3.9+ instalado na máquina
+OBS: assume-se que já tenha python3.9+ e pip instalados na máquina
 
 ### 3. Instalar Dependências
 Com o ambiente virtual ativado, instale as dependências do projeto com o comando:
