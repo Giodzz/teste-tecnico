@@ -1,5 +1,11 @@
 # Teste Técnico
-Repositório para organizar código e documentação do teste técnico para projeto no ceia 
+Repositório para organizar código e documentação do teste técnico de Engenharia de Dados para projeto no ceia.
+
+O pipeline sege a seguinte forma:
+- extração de metadados (título e descrição) e de transcrição de um vídeo do youtube dado uma URL
+- processo de limpeza (remoção de acentos, caracteres especiais e normalização em minpusculas)
+- processo de remoção de _stopwords_
+- output em formato json
 
 ## Configurar Ambiente
 
@@ -48,4 +54,6 @@ YOUTUBE_API_KEY=<sua-cahve-aqui>
 ```
 python .\teste-tecnico\main.py
 ```
+
+## Formato da saída
 

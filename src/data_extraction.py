@@ -134,7 +134,7 @@ def get_transcript(video_url: str) -> list:
         return []
     
     try:
-        fetched_transcript = YouTubeTranscriptApi().fetch(video_id, languages=('pt')).to_raw_data()
+        fetched_transcript = YouTubeTranscriptApi().fetch(video_id, languages=('pt', 'Portuguese (auto-generated)')).to_raw_data()
         formatted_transcript = [{'start': snippet.get('start'), 'text': snippet.get('text')} for snippet in fetched_transcript]
         logger.info(f'Transcrição extraída com sucesso para o vídeo id: {video_id}')
         return formatted_transcript
